@@ -27,7 +27,6 @@ import config
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
-from DISClib.DataStructures import listiterator as it
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
@@ -139,14 +138,11 @@ def addRouteConnections(analyzer):
     que se puede realizar en una estación.
     """
     lststops = m.keySet(analyzer['stops'])
-    stopsiterator = it.newIterator(lststops)
-    while it.hasNext(stopsiterator):
-        key = it.next(stopsiterator)
+    for key in lt.iterator(lststops):
         lstroutes = m.get(analyzer['stops'], key)['value']
         prevrout = None
-        routeiterator = it.newIterator(lstroutes)
-        while it.hasNext(routeiterator):
-            route = key + '-' + it.next(routeiterator)
+        for route in lt.iterator(lstroutes):
+            route = key + '-' + route
             if prevrout is not None:
                 addConnection(analyzer, prevrout, route, 0)
                 addConnection(analyzer, route, prevrout, 0)
@@ -224,11 +220,9 @@ def servedRoutes(analyzer):
     retorna una de ellas
     """
     lstvert = m.keySet(analyzer['stops'])
-    itlstvert = it.newIterator(lstvert)
     maxvert = None
     maxdeg = 0
-    while(it.hasNext(itlstvert)):
-        vert = it.next(itlstvert)
+    for vert in lt.iterator(lstvert):
         lstroutes = m.get(analyzer['stops'], vert)['value']
         degree = lt.size(lstroutes)
         if(degree > maxdeg):
