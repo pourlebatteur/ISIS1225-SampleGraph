@@ -27,6 +27,7 @@
 
 import sys
 import config
+import threading
 from App import controller
 from DISClib.ADT import stack
 import timeit
@@ -46,7 +47,8 @@ operación seleccionada.
 
 servicefile = 'bus_routes_14000.csv'
 initialStation = None
-recursionLimit = 20000
+recursionLimit=10**6
+
 
 # ___________________________________________________
 #  Menu principal
@@ -68,7 +70,7 @@ def printMenu():
     print("*******************************************")
 
 
-def optionTwo():
+def optionTwo(cont):
     print("\nCargando información de transporte de singapur ....")
     controller.loadServices(cont, servicefile)
     numedges = controller.totalConnections(cont)
@@ -76,27 +78,25 @@ def optionTwo():
     print('Numero de vertices: ' + str(numvertex))
     print('Numero de arcos: ' + str(numedges))
     print('El limite de recursion actual: ' + str(sys.getrecursionlimit()))
-    sys.setrecursionlimit(recursionLimit)
-    print('El limite de recursion se ajusta a: ' + str(recursionLimit))
+    
 
-
-def optionThree():
+def optionThree(cont):
     print('El número de componentes conectados es: ' +
           str(controller.connectedComponents(cont)))
 
 
-def optionFour():
+def optionFour(cont, initialStation):
     controller.minimumCostPaths(cont, initialStation)
 
 
-def optionFive():
+def optionFive(cont,destStation):
     haspath = controller.hasPath(cont, destStation)
     print('Hay camino entre la estación base : ' +
           'y la estación: ' + destStation + ': ')
     print(haspath)
 
 
-def optionSix():
+def optionSix(cont, destStation):
     path = controller.minimumCostPath(cont, destStation)
     if path is not None:
         pathlen = stack.size(path)
@@ -108,7 +108,7 @@ def optionSix():
         print('No hay camino')
 
 
-def optionSeven():
+def optionSeven(cont):
     maxvert, maxdeg = controller.servedRoutes(cont)
     print('Estación: ' + maxvert + '  Total rutas servidas: '
           + str(maxdeg))
@@ -117,43 +117,46 @@ def optionSeven():
 """
 Menu principal
 """
-while True:
-    printMenu()
-    inputs = input('Seleccione una opción para continuar\n>')
+def thread_cicle():
+    while True:
+        printMenu()
+        inputs = input('Seleccione una opción para continuar\n>')
 
-    if int(inputs[0]) == 1:
-        print("\nInicializando....")
-        # cont es el controlador que se usará de acá en adelante
-        cont = controller.init()
+        if int(inputs[0]) == 1:
+            print("\nInicializando....")
+            # cont es el controlador que se usará de acá en adelante
+            cont = controller.init()
 
-    elif int(inputs[0]) == 2:
-        executiontime = timeit.timeit(optionTwo, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
+        elif int(inputs[0]) == 2:
+            optionTwo(cont)
 
-    elif int(inputs[0]) == 3:
-        executiontime = timeit.timeit(optionThree, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
+        elif int(inputs[0]) == 3:
+            optionThree(cont)
 
-    elif int(inputs[0]) == 4:
-        msg = "Estación Base: BusStopCode-ServiceNo (Ej: 75009-10): "
-        initialStation = input(msg)
-        executiontime = timeit.timeit(optionFour, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
+        elif int(inputs[0]) == 4:
+            msg = "Estación Base: BusStopCode-ServiceNo (Ej: 75009-10): "
+            initialStation = input(msg)
+            optionFour(cont, initialStation)
 
-    elif int(inputs[0]) == 5:
-        destStation = input("Estación destino (Ej: 15151-10): ")
-        executiontime = timeit.timeit(optionFive, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
+        elif int(inputs[0]) == 5:
+            destStation = input("Estación destino (Ej: 15151-10): ")
+            optionFive(cont, destStation)
 
-    elif int(inputs[0]) == 6:
-        destStation = input("Estación destino (Ej: 15151-10): ")
-        executiontime = timeit.timeit(optionSix, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
+        elif int(inputs[0]) == 6:
+            destStation = input("Estación destino (Ej: 15151-10): ")
+            optionSix(cont,destStation)
 
-    elif int(inputs[0]) == 7:
-        executiontime = timeit.timeit(optionSeven, number=1)
-        print("Tiempo de ejecución: " + str(executiontime))
+        elif int(inputs[0]) == 7:
+            optionSeven(cont)
 
-    else:
-        sys.exit(0)
-sys.exit(0)
+        else:
+            sys.exit(0)
+    sys.exit(0)
+
+if __name__ == "__main__":
+    threading.stack_size(67108864) # 64MB stack
+    sys.setrecursionlimit(2 ** 20)
+    thread = threading.Thread(target=thread_cicle)
+    thread.start()
+
+    
