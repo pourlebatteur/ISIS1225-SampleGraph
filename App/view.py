@@ -30,7 +30,6 @@ import config
 import threading
 from App import controller
 from DISClib.ADT import stack
-import timeit
 assert config
 
 """
@@ -47,8 +46,6 @@ operación seleccionada.
 
 servicefile = 'bus_routes_14000.csv'
 initialStation = None
-recursionLimit=10**6
-
 
 # ___________________________________________________
 #  Menu principal
@@ -78,7 +75,7 @@ def optionTwo(cont):
     print('Numero de vertices: ' + str(numvertex))
     print('Numero de arcos: ' + str(numedges))
     print('El limite de recursion actual: ' + str(sys.getrecursionlimit()))
-    
+
 
 def optionThree(cont):
     print('El número de componentes conectados es: ' +
@@ -89,7 +86,7 @@ def optionFour(cont, initialStation):
     controller.minimumCostPaths(cont, initialStation)
 
 
-def optionFive(cont,destStation):
+def optionFive(cont, destStation):
     haspath = controller.hasPath(cont, destStation)
     print('Hay camino entre la estación base : ' +
           'y la estación: ' + destStation + ': ')
@@ -117,7 +114,9 @@ def optionSeven(cont):
 """
 Menu principal
 """
-def thread_cicle():
+
+
+def thread_cycle():
     while True:
         printMenu()
         inputs = input('Seleccione una opción para continuar\n>')
@@ -144,7 +143,7 @@ def thread_cicle():
 
         elif int(inputs[0]) == 6:
             destStation = input("Estación destino (Ej: 15151-10): ")
-            optionSix(cont,destStation)
+            optionSix(cont, destStation)
 
         elif int(inputs[0]) == 7:
             optionSeven(cont)
@@ -153,10 +152,9 @@ def thread_cicle():
             sys.exit(0)
     sys.exit(0)
 
-if __name__ == "__main__":
-    threading.stack_size(67108864) # 64MB stack
-    sys.setrecursionlimit(2 ** 20)
-    thread = threading.Thread(target=thread_cicle)
-    thread.start()
 
-    
+if __name__ == "__main__":
+    threading.stack_size(67108864)  # 64MB stack
+    sys.setrecursionlimit(2 ** 20)
+    thread = threading.Thread(target=thread_cycle)
+    thread.start()
